@@ -1,0 +1,7 @@
+,total_return,total_return,ann_vol,ann_vol,sharpe,sharpe,max_drawdown,max_drawdown,trades,trades,total_cost,total_cost
+,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std
+strategy,,,,,,,,,,,,
+Buy & Hold,0.9439,,0.21,,0.7403,,-0.3372,,1.0,,9.99,
+DQN,0.4051,0.384,0.1696,0.0167,0.4359,0.2897,-0.3063,0.0754,205.4,44.9088,2335.4018,449.6533
+MA crossover (5/20),0.8806,,0.1274,,1.0579,,-0.1641,,62.0,,896.4554,
+Random,-0.0792,0.3205,0.1449,0.0108,-0.0901,0.493,-0.381,0.1181,415.8,16.3921,3825.063,842.7738
