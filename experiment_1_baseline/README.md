@@ -59,8 +59,3 @@ All results are on the 2020 to 2024 test period with a 0.1% cost per trade, aver
 The DQN earned less than buy and hold on every asset. It beat random trading on SPY, AAPL, MSFT, and AMZN but not on TSLA. On SPY the five seeds ranged from 3% to 90% return, so the average is not very reliable. Trading costs also took a large share of the gains, because the agent made between 200 and 380 trades. With no cost the SPY return was 69%, with a 0.1% cost it was 41%, and with a 0.5% cost it was 53%, where the agent learned to trade much less.
 
 TSLA only began trading in 2010, so its training period is shorter (2010 to 2017). The results for each asset, with plots of portfolio value and trades, are in `results/`.
-
-
-## Reference
-
-Lu, E. Q Trader. https://github.com/edwardhdlu/q-trader. We used it as a reference for the problem setup only. Mnih et al. (2015) and van Hasselt et al. (2016) describe the DQN and Double DQN methods we implemented.
