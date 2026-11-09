@@ -2,10 +2,11 @@
 
 Actions: 0 = hold, 1 = buy (invest all cash), 2 = sell (liquidate all shares).
 Invalid actions (buy with no cash, sell with no shares) are treated as hold.
+Shares are fractional; a buy spends all cash, a sell liquidates all shares.
 Decision at close of day t, executed at close of day t, reward over t -> t+1:
-    r_t = log(V_{t+1} / V_t) - transaction_cost_t
-implemented as log of end value over pre-trade value, i.e. trade fees are
-deducted from the portfolio and therefore from the reward.
+    r_t = log(V_{t+1} / V_t)
+The fee is deducted from cash/shares when the trade happens, so it is already inside V_{t+1}.
+Do NOT subtract the cost again in the reward, or it would be counted twice.
 """
 import numpy as np
 import gymnasium as gym

@@ -14,7 +14,7 @@ The full record of what we did and why is in `IMPROVEMENT_LOG.md`.
 * **Model selection.** We measure validation performance every 10 episodes, smooth it over two checks, and keep the best checkpoint. We train 10 seeds and combine them by averaging their Q values.
 * **Testing.** We use nine walk forward periods (2008 to 2009, 2010 to 2011, up to 2024), each trained only on earlier data, and we use bootstrap confidence intervals instead of single numbers.
 * **Benchmarks.** Buy and hold, a constant exposure version with the same average holding as the DQN, a moving average whose windows are chosen on validation data, and random trading with the same number of trades as the DQN.
-* **Trading.** Decisions are made at the close and carried out at the next open. The cost is 0.05% per trade. Cash earns the 3 month T-bill rate. The agent holds 0%, 50%, or 100% of its money in the asset.
+* **Trading.** Decisions are made at the close and carried out at the next open. The cost is 0.05% per trade. Cash earns the 3 month T-bill rate. The agent holds 0%, 50%, or 100% of its money in the asset. Shares are fractional, and each decision trades just enough shares to reach the chosen weight. The 0.05% fee is deducted from the portfolio at the moment of the trade, and the reward is the log change in portfolio value, so the cost is counted once. Buy and hold is run in the same environment over the same nine test periods and with the same cost.
 * **Data.** We tested several extra data groups on top of price and volume: VIX and interest rates, dollar, gold, and oil, sector ETFs, bonds and credit, and volatility indices.
 
 

@@ -34,7 +34,24 @@ Our main research question is: can a DQN agent learn to choose trading actions t
 | Write-up | `PROJECT_STEPS_FOLLOWED.md` | `IMPROVEMENT_LOG.md` |
 
 
-## 4. Results
+## 4. Environment Design: Actions, Portfolio, and Costs
+
+**Portfolio representation.** The portfolio is cash plus a number of shares of one asset. Shares are fractional, so any cash amount can be fully invested. Portfolio value is V = cash + shares x price. The agent starts with $10,000 and is long only (no shorting, no leverage).
+
+**Action semantics.**
+
+| | Experiment 1 | Experiment 2 |
+|---|---|---|
+| Actions | 0 = hold, 1 = buy, 2 = sell | 0, 1, 2 = target exposure of 0%, 50%, 100% of portfolio value in the asset |
+| Shares traded | Buy: all cash goes into shares. Sell: all shares are sold. | The number needed to reach the target weight: (w x V - current share value) / price. Choosing the current level means no trade. |
+| Invalid actions | Buying with no cash or selling with no shares is treated as hold. | None possible, since any level can be chosen at any time. |
+| Execution | Same day close | Next day open |
+| State | 8 market features, position fraction, cash fraction, log portfolio value | Market features and current exposure fraction |
+
+**Transaction costs and reward (no double counting).** A trade costs a fixed fraction of the traded amount (0.1% in experiment 1, 0.05% in experiment 2). The fee is taken out of cash and shares at the moment of the trade, so it is already inside the portfolio value. The reward is only the log growth of that value, r_t = log(V_(t+1) / V_t). We do not subtract the cost a second time. The proposal wrote the reward as the log value ratio combined with a transaction cost term. Read literally that would count the cost twice, so the code uses the value-based version only. In experiment 2 the reward also includes the interest on cash and the overnight price gap.
+
+
+## 5. Results
 
 On SPY in experiment 1, the DQN returned 41% over 2020 to 2024 against 94% for buy and hold, with a Sharpe ratio of 0.44 against 0.74. It did beat random trading, but it did not beat buy and hold on any of the five assets. The result also varied a lot between seeds, with SPY returns ranging from 3% to 90%.
 
@@ -55,12 +72,18 @@ The macro variant looked best at first, so we repeated it with new seeds. The sc
 Our conclusion is that, in this setup, the DQN does not reliably beat simply holding the index. We report this as a historical simulation finding only.
 
 
-## 5. Limitations
+## 6. Limitations
 
-Experiment 2 only tests SPY. The multi stock test in experiment 1 used four stocks that we picked after knowing they had done well, which favors buy and hold. Our hyperparameter search was small, and each network trained for only 120 short episodes on a CPU. Even the 10 seed ensemble moves by about 0.2 in Sharpe ratio between repeats, which is as large as the differences we were trying to measure. Daily price direction is also hard to predict in general. Finally, our simulation leaves out issues such as slippage, taxes, and liquidity, and good historical results would not guarantee future performance.
+**Benchmark.** In both experiments buy and hold is run through the same environment, on exactly the same test period(s), with the same trading cost as the DQN (so buy and hold also pays its entry fee). The DQN and every other strategy are compared with it over identical dates.
+
+**One asset.** The agent learns from a single asset, so we cannot say whether anything it learned about SPY carries over to other assets. Experiment 2 only tests SPY. The multi stock test in experiment 1 used four stocks that we picked after knowing they had done well, which favors buy and hold. SPY is also a diversified index that rises over the long run, which makes holding hard to beat.
+
+**One historical market.** All the data is one realization of US stock history. Experiment 1 tested on 2020 to 2024 only, a strong bull market with one sharp crash and recovery, so its results say little about other conditions. Experiment 2 reduces this by testing nine periods from 2008 to 2024, including the 2008 crash and the 2022 decline, but they are still the same market, fewer than ten non-overlapping periods, and mostly rising. The last period (2024) is only one year long. Regimes that are not in the data, such as long high-inflation periods or a prolonged bear market like the 1970s, cannot be evaluated, and we cannot tell whether the agent would work in them.
+
+**Other limits.** Our hyperparameter search was small, and each network trained for only 120 short episodes on a CPU. Even the 10 seed ensemble moves by about 0.2 in Sharpe ratio between repeats, which is as large as the differences we were trying to measure. Daily price direction is also hard to predict in general. Finally, our simulation leaves out issues such as slippage, taxes, and liquidity, and good historical results would not guarantee future performance.
 
 
-## 6. How to Run
+## 7. How to Run
 
 We used Python 3.13 and the packages in `requirements.txt`. Training ran on a CPU only. Run the scripts from inside each experiment folder.
 
@@ -70,7 +93,7 @@ We used Python 3.13 and the packages in `requirements.txt`. Training ran on a CP
 Data comes from Yahoo! Finance through `yfinance`, so the numbers may shift slightly if Yahoo revises its history. Market data, model checkpoints, and the per day return files are not stored in the repository, and the scripts recreate them.
 
 
-## 7. Tools
+## 8. Tools
 
 We used Python, NumPy, Pandas, Matplotlib, SciPy, PyTorch, yfinance, and a custom trading environment based on the Gymnasium style. Claude Code was used as a coding assistant to help write and run the experiments.
 
